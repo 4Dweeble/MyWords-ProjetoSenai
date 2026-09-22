@@ -29,7 +29,7 @@ O MyWords será um sistema desenvolvido para facilitar a criação, edição, or
 - [ ] **RF01:** O sistema deve permitir o cadastro de novos usuários.
 - [ ] **RF02:** O sistema deve permitir o login e autenticação de usuários.
 - [ ] **RF03:** O sistema deve exibir uma listagem do que já foi escrito.
-- [ ] **RF04:** O sistema deve permitir a de novos Textos.
+- [ ] **RF04:** O sistema deve permitir a criação de novos Textos.
 - [ ] **RF05:** O sistema deve permitir a edição de Textos.
 - [ ] **RF06:** O sistema deve permitir a exclusão de Textos.
 - [ ] **RF07:** O sistema deve permitir o download de Textos em formado .docx ou .doc.
