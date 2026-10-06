@@ -1,0 +1,378 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --fundo: #f5f7fb;
+    --branco: #ffffff;
+    --borda: #e2e6ee;
+    --texto: #202633;
+    --cinza: #687386;
+    --azul: #2563eb;
+    --azul-claro: #eff6ff;
+    --verde: #217346;
+    --vermelho: #dc2626;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--fundo);
+    color: var(--texto);
+}
+
+button, input, select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 300px;
+    background: var(--branco);
+    border-right: 1px solid var(--borda);
+    display: flex;
+    flex-direction: column;
+    padding: 22px 16px;
+}
+
+.brand {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 22px;
+    padding: 0 8px;
+}
+
+.btn-novo {
+    border: 0;
+    background: var(--azul);
+    color: white;
+    border-radius: 9px;
+    padding: 12px 14px;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.btn-novo:hover {
+    filter: brightness(.94);
+}
+
+.pesquisa {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f3f5f8;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    padding: 9px 11px;
+    margin-bottom: 20px;
+}
+
+.pesquisa input {
+    border: 0;
+    outline: 0;
+    background: transparent;
+    width: 100%;
+}
+
+.nav-titulo {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--cinza);
+    padding: 0 8px 8px;
+    letter-spacing: .08em;
+}
+
+.lista-textos {
+    overflow-y: auto;
+    max-height: calc(100vh - 230px);
+}
+
+.item-texto {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    background: transparent;
+    padding: 11px 10px;
+    border-radius: 8px;
+    margin-bottom: 3px;
+}
+
+.item-texto:hover {
+    background: #f4f6f9;
+}
+
+.item-texto.ativo {
+    background: var(--azul-claro);
+    color: var(--azul);
+}
+
+.item-titulo {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 700;
+}
+
+.item-data {
+    display: block;
+    color: var(--cinza);
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.item-vazio {
+    color: var(--cinza);
+    font-size: 13px;
+    padding: 15px 8px;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 14px 8px 0;
+    color: var(--cinza);
+    font-size: 12px;
+    border-top: 1px solid var(--borda);
+}
+
+.conteudo {
+    flex: 1;
+    min-width: 0;
+}
+
+.topbar {
+    height: 70px;
+    background: var(--branco);
+    border-bottom: 1px solid var(--borda);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+}
+
+.status {
+    color: var(--cinza);
+    font-size: 13px;
+}
+
+.top-actions {
+    display: flex;
+    gap: 9px;
+}
+
+.btn-secundario,
+.btn-word,
+.btn-excluir,
+.btn-excluir-confirmar {
+    border-radius: 8px;
+    padding: 10px 15px;
+    border: 1px solid var(--borda);
+    background: white;
+}
+
+.btn-word {
+    background: var(--verde);
+    color: white;
+    border-color: var(--verde);
+}
+
+.btn-excluir {
+    color: var(--vermelho);
+}
+
+.btn-excluir-confirmar {
+    background: var(--vermelho);
+    color: white;
+    border-color: var(--vermelho);
+}
+
+.editor-area {
+    max-width: 1000px;
+    margin: 32px auto;
+    background: var(--branco);
+    min-height: calc(100vh - 134px);
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.04);
+}
+
+.titulo {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--texto);
+}
+
+.titulo::placeholder {
+    color: #a5adba;
+}
+
+.info {
+    display: flex;
+    justify-content: space-between;
+    color: var(--cinza);
+    font-size: 12px;
+    margin: 9px 0 18px;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    border-top: 1px solid var(--borda);
+    border-bottom: 1px solid var(--borda);
+    padding: 10px 0;
+    margin-bottom: 18px;
+}
+
+.toolbar button,
+.toolbar select {
+    min-height: 34px;
+    border: 1px solid var(--borda);
+    background: #fafbfc;
+    border-radius: 6px;
+    padding: 0 10px;
+}
+
+.toolbar button:hover {
+    background: #eef2f7;
+}
+
+.separador {
+    width: 1px;
+    background: var(--borda);
+    margin: 0 4px;
+}
+
+.editor {
+    min-height: 550px;
+    outline: none;
+    font-size: 17px;
+    line-height: 1.75;
+}
+
+.editor:empty::before {
+    content: "Comece a escrever aqui...";
+    color: #a5adba;
+}
+
+.rodape-editor {
+    border-top: 1px solid var(--borda);
+    margin-top: 22px;
+    padding-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--cinza);
+    font-size: 12px;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .45);
+    display: grid;
+    place-items: center;
+    padding: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+.modal-card {
+    width: min(420px, 100%);
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.modal-card h2 {
+    margin-bottom: 8px;
+}
+
+.modal-card p {
+    color: var(--cinza);
+    line-height: 1.5;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 22px;
+}
+
+@media (max-width: 800px) {
+    .sidebar {
+        width: 235px;
+    }
+
+    .editor-area {
+        margin: 15px;
+        padding: 20px;
+    }
+
+    .topbar {
+        padding: 0 15px;
+    }
+}
+
+@media (max-width: 620px) {
+    .app {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        min-height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--borda);
+    }
+
+    .lista-textos {
+        max-height: 180px;
+    }
+
+    .sidebar-footer {
+        display: none;
+    }
+
+    .topbar {
+        height: auto;
+        padding: 12px 15px;
+        gap: 10px;
+    }
+
+    .top-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .editor-area {
+        min-height: auto;
+    }
+
+    .editor {
+        min-height: 400px;
+    }
+
+    .rodape-editor {
+        align-items: flex-start;
+        gap: 12px;
+        flex-direction: column;
+    }
+}
