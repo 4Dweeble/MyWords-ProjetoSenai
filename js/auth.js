@@ -1,16 +1,26 @@
-const CHAVE_USUARIO = "mywordsUsuarioV1";
-
 function mostrarMensagem(texto, sucesso = false) {
     const mensagem = document.getElementById("mensagem");
     mensagem.textContent = texto;
     mensagem.className = "auth-mensagem" + (sucesso ? " sucesso" : "");
 }
 
+async function enviarAuth(dados) {
+    const resposta = await fetch("../api/auth.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+    });
+    const resultado = await resposta.json().catch(() => ({}));
+    if (!resposta.ok || !resultado.ok) {
+        throw new Error(resultado.erro || "Não foi possível concluir a operação.");
+    }
+    return resultado;
+}
+
 const formCadastro = document.getElementById("formCadastro");
 if (formCadastro) {
-    formCadastro.addEventListener("submit", (evento) => {
+    formCadastro.addEventListener("submit", async (evento) => {
         evento.preventDefault();
-
         const nome = document.getElementById("nome").value.trim();
         const email = document.getElementById("email").value.trim();
         const senha = document.getElementById("senha").value;
@@ -20,43 +30,42 @@ if (formCadastro) {
             mostrarMensagem("As senhas não coincidem.");
             return;
         }
+        if (senha.length < 6) {
+            mostrarMensagem("A senha precisa ter pelo menos 6 caracteres.");
+            return;
+        }
 
-        const usuario = { nome, email, senha };
-        localStorage.setItem(CHAVE_USUARIO, JSON.stringify(usuario));
-        mostrarMensagem("Cadastro realizado com sucesso!", true);
-
-        setTimeout(() => {
-            window.location.href = "login.html";
-        }, 800);
+        const botao = formCadastro.querySelector('button[type="submit"]');
+        botao.disabled = true;
+        try {
+            const resultado = await enviarAuth({ acao: "cadastro", nome, email, senha });
+            mostrarMensagem(resultado.mensagem || "Cadastro realizado com sucesso!", true);
+            setTimeout(() => { window.location.href = "login.php"; }, 900);
+        } catch (erro) {
+            mostrarMensagem(erro.message);
+        } finally {
+            botao.disabled = false;
+        }
     });
 }
 
 const formLogin = document.getElementById("formLogin");
 if (formLogin) {
-    formLogin.addEventListener("submit", (evento) => {
+    formLogin.addEventListener("submit", async (evento) => {
         evento.preventDefault();
-
-        const nome = document.getElementById("nome").value.trim();
+        const email = document.getElementById("email").value.trim();
         const senha = document.getElementById("senha").value;
-        const salvo = localStorage.getItem(CHAVE_USUARIO);
+        const botao = formLogin.querySelector('button[type="submit"]');
+        botao.disabled = true;
 
-        if (!salvo) {
-            mostrarMensagem("Nenhum cadastro encontrado. Cadastre-se primeiro.");
-            return;
+        try {
+            await enviarAuth({ acao: "login", email, senha });
+            mostrarMensagem("Login realizado com sucesso!", true);
+            setTimeout(() => { window.location.href = "index.php"; }, 350);
+        } catch (erro) {
+            mostrarMensagem(erro.message);
+        } finally {
+            botao.disabled = false;
         }
-
-        const usuario = JSON.parse(salvo);
-
-        if (nome !== usuario.nome || senha !== usuario.senha) {
-            mostrarMensagem("Nome ou senha incorretos.");
-            return;
-        }
-
-        localStorage.setItem("mywordsLogado", "true");
-        mostrarMensagem("Login realizado com sucesso!", true);
-
-        setTimeout(() => {
-            window.location.href = "index.html";
-        }, 500);
     });
 }

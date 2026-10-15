@@ -1,4 +1,6 @@
-CREATE DATABASE IF NOT EXISTS mywords;
+CREATE DATABASE IF NOT EXISTS mywords
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
 
 USE mywords;
 
@@ -7,7 +9,7 @@ CREATE TABLE IF NOT EXISTS usuarios_lista (
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS documento (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -16,10 +18,9 @@ CREATE TABLE IF NOT EXISTS documento (
     data_criacao DATETIME NOT NULL,
     data_modf DATETIME NOT NULL,
     usuarios_lista_id INT NOT NULL,
-
     CONSTRAINT fk_documento_usuario
         FOREIGN KEY (usuarios_lista_id)
         REFERENCES usuarios_lista(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
