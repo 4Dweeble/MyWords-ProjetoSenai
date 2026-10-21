@@ -24,3 +24,16 @@ CREATE TABLE IF NOT EXISTS documento (
         ON DELETE CASCADE
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Tokens temporários para redefinição de senha (válidos por até 1 hora).
+CREATE TABLE IF NOT EXISTS tokens_redefinicao (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    token_hash CHAR(64) NOT NULL UNIQUE,
+    expira_em DATETIME NOT NULL,
+    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_token_usuario FOREIGN KEY (usuario_id)
+        REFERENCES usuarios_lista(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    INDEX idx_token_expira (expira_em)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

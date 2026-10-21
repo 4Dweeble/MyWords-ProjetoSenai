@@ -69,3 +69,41 @@ if (formLogin) {
         }
     });
 }
+
+
+const formRecuperar = document.getElementById("formRecuperar");
+if (formRecuperar) {
+    const token = formRecuperar.dataset.token || "";
+    const grupoEmail = document.getElementById("grupoEmail");
+    const grupoNovaSenha = document.getElementById("grupoNovaSenha");
+    const emailInput = document.getElementById("email");
+    const novaSenhaInput = document.getElementById("novaSenha");
+
+    if (token) {
+        grupoEmail.hidden = true;
+        emailInput.required = false;
+        novaSenhaInput.required = true;
+    }
+
+    formRecuperar.addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        const botao = formRecuperar.querySelector('button[type="submit"]');
+        botao.disabled = true;
+        try {
+            if (token) {
+                const resultado = await enviarAuth({ acao: "redefinir_senha", token, novaSenha: novaSenhaInput.value });
+                mostrarMensagem(resultado.mensagem || "Senha alterada. Você já pode entrar.", true);
+                botao.textContent = "Senha alterada";
+                setTimeout(() => { window.location.href = "login.php"; }, 1400);
+            } else {
+                const resultado = await enviarAuth({ acao: "solicitar_redefinicao", email: emailInput.value.trim() });
+                mostrarMensagem(resultado.mensagem || "Se o e-mail estiver cadastrado, você receberá um link de recuperação.", true);
+                formRecuperar.reset();
+            }
+        } catch (erro) {
+            mostrarMensagem(erro.message);
+        } finally {
+            botao.disabled = false;
+        }
+    });
+}

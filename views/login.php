@@ -28,6 +28,7 @@
                         <input id="senha" name="senha" type="password" autocomplete="current-password" required>
                     </div>
                     <button class="btn-auth" type="submit">Confirmar</button>
+                    <p class="auth-alternativa esqueci"><a href="recuperar.php">Esqueci a senha</a></p>
                     <div id="mensagem" class="auth-mensagem" aria-live="polite"></div>
                 </form>
                 <p class="auth-alternativa">Não possuo login. <a href="cadastro.php">Cadastrar</a></p>

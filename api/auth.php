@@ -71,4 +71,60 @@ if ($acao === 'login') {
     ]);
 }
 
+if ($acao === 'solicitar_redefinicao') {
+    $email = mb_strtolower(trim((string) ($dados['email'] ?? '')));
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        responder(['ok' => false, 'erro' => 'Informe um e-mail válido.'], 422);
+    }
+
+    $consulta = $pdo->prepare('SELECT id FROM usuarios_lista WHERE email = ? LIMIT 1');
+    $consulta->execute([$email]);
+    $usuario = $consulta->fetch();
+
+    // A resposta é igual exista ou não uma conta, evitando revelar e-mails cadastrados.
+    if ($usuario) {
+        $token = bin2hex(random_bytes(32));
+        $hashToken = hash('sha256', $token);
+        $expira = (new DateTimeImmutable('+1 hour'))->format('Y-m-d H:i:s');
+        $pdo->prepare('DELETE FROM tokens_redefinicao WHERE usuario_id = ?')->execute([(int) $usuario['id']]);
+        $pdo->prepare('INSERT INTO tokens_redefinicao (usuario_id, token_hash, expira_em) VALUES (?, ?, ?)')
+            ->execute([(int) $usuario['id'], $hashToken, $expira]);
+
+        $https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+        $esquema = $https ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/api/auth.php')), '/\\');
+        $link = $esquema . '://' . $host . $base . '/views/recuperar.php?token=' . urlencode($token);
+        $assunto = 'Recuperação de senha - MyWords';
+        $mensagemEmail = "Você solicitou a redefinição da senha do MyWords.\nAcesse o link abaixo em até 1 hora:\n$link\n\nSe não foi você, ignore esta mensagem.";
+        $cabecalhos = "Content-Type: text/plain; charset=UTF-8\r\n";
+        @mail($email, $assunto, $mensagemEmail, $cabecalhos);
+    }
+
+    responder(['ok' => true, 'mensagem' => 'Se o e-mail estiver cadastrado, você receberá um link de recuperação em breve.']);
+}
+
+if ($acao === 'redefinir_senha') {
+    $token = trim((string) ($dados['token'] ?? ''));
+    $novaSenha = (string) ($dados['novaSenha'] ?? '');
+    if (strlen($novaSenha) < 6) {
+        responder(['ok' => false, 'erro' => 'A nova senha precisa ter pelo menos 6 caracteres.'], 422);
+    }
+    if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
+        responder(['ok' => false, 'erro' => 'Link de recuperação inválido ou expirado.'], 400);
+    }
+
+    $consulta = $pdo->prepare('SELECT id, usuario_id FROM tokens_redefinicao WHERE token_hash = ? AND expira_em > NOW() LIMIT 1');
+    $consulta->execute([hash('sha256', $token)]);
+    $registro = $consulta->fetch();
+    if (!$registro) {
+        responder(['ok' => false, 'erro' => 'Link de recuperação inválido ou expirado. Solicite um novo link.'], 400);
+    }
+
+    $hashSenha = password_hash($novaSenha, PASSWORD_DEFAULT);
+    $pdo->prepare('UPDATE usuarios_lista SET senha = ? WHERE id = ?')->execute([$hashSenha, (int) $registro['usuario_id']]);
+    $pdo->prepare('DELETE FROM tokens_redefinicao WHERE usuario_id = ?')->execute([(int) $registro['usuario_id']]);
+    responder(['ok' => true, 'mensagem' => 'Senha alterada com sucesso. Você já pode entrar.']);
+}
+
 responder(['ok' => false, 'erro' => 'Ação não reconhecida.'], 400);

@@ -89,3 +89,6 @@ button, a { cursor: pointer; }
     .auth-top-actions .auth-link:first-child { display: none; }
     .auth-card { padding: 24px 20px; }
 }
+
+.auth-alternativa.esqueci { margin-top: 12px; margin-bottom: 4px; }
+[hidden] { display: none !important; }
