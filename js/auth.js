@@ -17,6 +17,45 @@ async function enviarAuth(dados) {
     return resultado;
 }
 
+const formPerfil = document.getElementById("formPerfil");
+if (formPerfil) {
+    formPerfil.addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+        const nome = document.getElementById("nome").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const senhaAtual = document.getElementById("senhaAtual").value;
+        const novaSenha = document.getElementById("novaSenha").value;
+        const confirmarSenha = document.getElementById("confirmarSenha").value;
+
+        if (novaSenha !== confirmarSenha) {
+            mostrarMensagem("A nova senha e a confirmação não coincidem.");
+            return;
+        }
+        if (novaSenha && novaSenha.length < 6) {
+            mostrarMensagem("A nova senha precisa ter pelo menos 6 caracteres.");
+            return;
+        }
+        if (!novaSenha && (senhaAtual || confirmarSenha)) {
+            mostrarMensagem("Para trocar a senha, preencha a senha atual, a nova senha e a confirmação.");
+            return;
+        }
+
+        const botao = formPerfil.querySelector('button[type="submit"]');
+        botao.disabled = true;
+        try {
+            const resultado = await enviarAuth({ acao: "atualizar_perfil", nome, email, senhaAtual, novaSenha, confirmarSenha });
+            mostrarMensagem(resultado.mensagem || "Cadastro atualizado com sucesso.", true);
+            document.getElementById("senhaAtual").value = "";
+            document.getElementById("novaSenha").value = "";
+            document.getElementById("confirmarSenha").value = "";
+        } catch (erro) {
+            mostrarMensagem(erro.message);
+        } finally {
+            botao.disabled = false;
+        }
+    });
+}
+
 const formCadastro = document.getElementById("formCadastro");
 if (formCadastro) {
     formCadastro.addEventListener("submit", async (evento) => {

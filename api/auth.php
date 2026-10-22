@@ -26,6 +26,58 @@ if ($metodo !== 'POST') {
 $dados = lerJson();
 $acao = (string) ($dados['acao'] ?? '');
 
+if ($acao === 'atualizar_perfil') {
+    $usuarioId = exigirLogin();
+    $nome = trim((string) ($dados['nome'] ?? ''));
+    $email = mb_strtolower(trim((string) ($dados['email'] ?? '')));
+    $senhaAtual = (string) ($dados['senhaAtual'] ?? '');
+    $novaSenha = (string) ($dados['novaSenha'] ?? '');
+    $confirmarSenha = (string) ($dados['confirmarSenha'] ?? '');
+
+    if ($nome === '' || mb_strlen($nome) > 100 || !filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 100) {
+        responder(['ok' => false, 'erro' => 'Informe um nome e um e-mail válido.'], 422);
+    }
+
+    $consulta = $pdo->prepare('SELECT id, senha FROM usuarios_lista WHERE id = ? LIMIT 1');
+    $consulta->execute([$usuarioId]);
+    $usuario = $consulta->fetch();
+    if (!$usuario) {
+        session_destroy();
+        responder(['ok' => false, 'erro' => 'Usuário não encontrado. Entre novamente.'], 401);
+    }
+
+    $consultaEmail = $pdo->prepare('SELECT id FROM usuarios_lista WHERE email = ? AND id <> ? LIMIT 1');
+    $consultaEmail->execute([$email, $usuarioId]);
+    if ($consultaEmail->fetch()) {
+        responder(['ok' => false, 'erro' => 'Este e-mail já está sendo usado por outra conta.'], 409);
+    }
+
+    $alterarSenha = $senhaAtual !== '' || $novaSenha !== '' || $confirmarSenha !== '';
+    if ($alterarSenha) {
+        if ($senhaAtual === '' || $novaSenha === '' || $confirmarSenha === '') {
+            responder(['ok' => false, 'erro' => 'Para trocar a senha, preencha a senha atual, a nova senha e a confirmação.'], 422);
+        }
+        if (strlen($novaSenha) < 6) {
+            responder(['ok' => false, 'erro' => 'A nova senha precisa ter pelo menos 6 caracteres.'], 422);
+        }
+        if ($novaSenha !== $confirmarSenha) {
+            responder(['ok' => false, 'erro' => 'A nova senha e a confirmação não coincidem.'], 422);
+        }
+        if (!password_verify($senhaAtual, $usuario['senha'])) {
+            responder(['ok' => false, 'erro' => 'A senha atual está incorreta.'], 422);
+        }
+        $hashSenha = password_hash($novaSenha, PASSWORD_DEFAULT);
+        $atualizar = $pdo->prepare('UPDATE usuarios_lista SET nome = ?, email = ?, senha = ? WHERE id = ?');
+        $atualizar->execute([$nome, $email, $hashSenha, $usuarioId]);
+    } else {
+        $atualizar = $pdo->prepare('UPDATE usuarios_lista SET nome = ?, email = ? WHERE id = ?');
+        $atualizar->execute([$nome, $email, $usuarioId]);
+    }
+
+    $_SESSION['usuario_nome'] = $nome;
+    responder(['ok' => true, 'mensagem' => 'Cadastro atualizado com sucesso.', 'usuario' => ['id' => $usuarioId, 'nome' => $nome, 'email' => $email]]);
+}
+
 if ($acao === 'cadastro') {
     $nome = trim((string) ($dados['nome'] ?? ''));
     $email = mb_strtolower(trim((string) ($dados['email'] ?? '')));

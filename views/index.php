@@ -34,7 +34,7 @@ $nomeUsuario = htmlspecialchars((string) ($_SESSION['usuario_nome'] ?? 'Usuário
             <header class="topbar">
                 <div><div class="status" id="status">Conectando...</div></div>
                 <div class="top-actions">
-                    <span class="usuario-logado"><?= $nomeUsuario ?></span>
+                    <a href="perfil.php" class="btn-secundario" style="text-decoration:none;color:inherit;">👤 Meu perfil</a>
                     <button id="salvar" class="btn-secundario">💾 Salvar</button>
                     <button id="baixar" class="btn-word">📥 Baixar Word</button>
                     <a href="../api/logout.php" class="btn-secundario" style="text-decoration:none;color:inherit;">Sair</a>
